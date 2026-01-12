@@ -2,18 +2,18 @@
 
 **Simple TypeScript + Express backend template**
 
-## 🔎 Project overview
-A minimal TypeScript backend using Express. This repo demonstrates a small HTTP server and the TypeScript configuration needed to run it with `ts-node` during development.
+---
 
-## ✅ What we have done so far
-- Added a minimal Express server in `src/server.ts` with a `/ping` route that returns `Pong Hello, TypeScript with Express!`.
-- Configured TypeScript in `tsconfig.json` and adjusted settings to run with `ts-node`:
-  - Set `"module": "commonjs"` and `"moduleResolution": "node"` to work with `ts-node`/Node (CommonJS).
-  - Disabled `"verbatimModuleSyntax"` (set to `false`) to allow TS imports in a CommonJS runtime.
-  - Enabled interoperability flags: `"esModuleInterop": true` and `"allowSyntheticDefaultImports": true` to avoid runtime import issues with CommonJS packages like Express.
-- Installed dependencies:
-  - `express` (runtime)
-  - Dev: `typescript`, `ts-node`, `@types/express`, `@types/node`, `nodemon`.
+## 🔎 Project overview
+A minimal TypeScript backend using Express and TypeScript. This repo demonstrates a small HTTP server, environment-based configuration with `dotenv`, and a simple route structure mounted under `/api`.
+
+## ✅ What’s included
+- Express server scaffolded in `src/server.ts`.
+- Environment-based server config in `src/config/index.ts` (reads `PORT` from `.env`, defaults to `3000`).
+- `GET /api/v1/ping` — returns `Pong Hello, TypeScript with Express!` (`src/controllers/ping.ts`).
+- `GET /api/v1/ping/health` — simple health check that returns `200 OK`.
+- `src/routers/v1` and a placeholder `src/routers/v2` (for future versioning).
+- `dotenv` is added as a dependency and `.env` is listed in `.gitignore`.
 
 ## ▶️ How to run (development)
 1. Install dependencies:
@@ -22,44 +22,58 @@ A minimal TypeScript backend using Express. This repo demonstrates a small HTTP 
    npm install
    ```
 
-2. Run the server directly with `ts-node`:
+2. Run the server directly with `ts-node` (development):
 
    ```bash
    npx ts-node src/server.ts
    ```
 
-3. Open `http://localhost:3000/ping` to verify the server responds.
+   Or add a convenience script to `package.json`:
 
-> Tip: Add a short `package.json` script for convenience (example below).
+   ```json
+   "scripts": {
+     "dev": "ts-node src/server.ts",
+     "dev:watch": "nodemon --watch src --exec \"ts-node\" src/server.ts",
+     "build": "tsc",
+     "start": "node dist/index.js"
+   }
+   ```
 
-```json
-"scripts": {
-  "dev": "ts-node src/server.ts",
-  "start": "node dist/index.js",
-  "build": "tsc"
-}
-```
+3. Verify endpoints:
 
-## ⚠️ Known issue that was fixed
-- Error: `ECMAScript imports and exports cannot be written in a CommonJS file under 'verbatimModuleSyntax'` caused by `verbatimModuleSyntax` + `module: "nodenext"`. Fix applied: switched to CommonJS module settings and turned off `verbatimModuleSyntax` so `import express from 'express'` runs under `ts-node`.
+   - `GET http://localhost:3000/api/v1/ping` → `Pong Hello, TypeScript with Express!`
+   - `GET http://localhost:3000/api/v1/ping/health` → `200 OK`
 
-If you prefer to use native ESM instead, we can revert to ESM settings and add `"type": "module"` to `package.json` and run `ts-node --esm`.
+4. To change port, create a `.env` file at the project root:
 
-## 🔭 Next steps (suggested)
-- Add `dev` script to `package.json` and optional `nodemon` setup for auto-reload.
-- Add a simple test setup (e.g., Jest or Vitest).
-- Add build & start scripts and CI (GitHub Actions) for automated checks.
-- Add more routes and small request/response examples.
+   ```env
+   PORT=4000
+   ```
+
+   (Note: `.env` is ignored by git — see `.gitignore`.)
+
+## ⚠️ Notes & known issues
+- `tsconfig.json` is configured for a CommonJS/Node-friendly setup (`module: "commonjs"`, `esModuleInterop: true`) so `import express from 'express'` works under `ts-node`.
+- If you prefer native ESM, add `"type": "module"` to `package.json` and switch TypeScript/ts-node flags accordingly.
+
+## 🔭 Suggested next steps
+- Add `dev`/`dev:watch` scripts (example above) for local development convenience.
+- Add tests (Jest/Vitest) and a CI workflow (GitHub Actions).
+- Add logging, request validation, and API docs (e.g., OpenAPI/Swagger) for growth.
+- Implement more endpoints and sample request/response schemas.
 
 ## 🛠 Troubleshooting
-- If you see `express_1.default is not a function` — ensure `"esModuleInterop": true` is set in `tsconfig.json`.
-- If you want true ESM behavior, set `"type": "module"` in `package.json`, adjust TS settings, and use `ts-node` with `--esm`.
+- If you see `express_1.default is not a function` — ensure `esModuleInterop` is set in `tsconfig.json`.
+- If the server does not start, check that `PORT` is set correctly and not already in use.
 
 ## 📄 Project files of interest
-- `src/server.ts` — Express server
+- `src/server.ts` — application entry, registers `/api/v1` and `/api/v2` routers
+- `src/config/index.ts` — `serverConfig` (dotenv-based PORT)
+- `src/controllers/ping.ts` — ping handler
+- `src/routers/v1/ping.router.ts` — ping routes and health check
 - `tsconfig.json` — TypeScript configuration
 - `package.json` — dependencies and scripts
 
 ---
 
-If you'd like, I can also add the `dev` script and a `.gitignore` (if missing) next — just tell me which you'd prefer and I'll add it.
+If you want, I can also add the `dev` and `dev:watch` scripts to `package.json` and add a simple `.env.example` file — tell me which you'd like me to add.
