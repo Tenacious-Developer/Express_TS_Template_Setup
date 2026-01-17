@@ -1,7 +1,5 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from "express";
 
-export const pingHandler = (req:Request, res:Response) => {
-    console.log('JSON Request received at /ping', req.body);
-    console.log('QueryParam Request received at /ping', req.query);
-    res.send('Pong Hello, TypeScript with Express!');
+export const pingHandler = async (req: Request, res: Response, next: NextFunction) => {
+    res.status(200).json({ message: "Pong!" });
 }
