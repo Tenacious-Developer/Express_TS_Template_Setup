@@ -1,18 +1,21 @@
 import dotenv from 'dotenv';
+import { validateEnv } from './env.validation';
 
-type ServerConfig = {
-    PORT: number;
-};
+// Load environment variables
+dotenv.config();
 
+// Validate and parse environment variables
+const env = validateEnv();
 
-function loadEnvFile() {
-    dotenv.config();
-}
+/**
+ * Server Configuration
+ */
+export const serverConfig = {
+    PORT: env.PORT,
+    NODE_ENV: env.NODE_ENV,
+    isDevelopment: env.NODE_ENV === 'development',
+    isProduction: env.NODE_ENV === 'production',
+} as const;
 
-loadEnvFile();  
-
-export const serverConfig:ServerConfig = {
-    PORT: Number(process.env.PORT || 3000)
-};
-
+export default serverConfig;
 
